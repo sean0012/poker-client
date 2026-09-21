@@ -1,38 +1,17 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { createGameClient } from "$lib/game/game-client.svelte";
-  import GameControls from "$lib/game/GameControls.svelte";
-  import RoomView from "$lib/game/RoomView.svelte";
-
-  const client = createGameClient();
-
-  onMount(() => {
-    return () => client.leaveRoom();
-  });
 </script>
 
 <svelte:head>
-  <title>Indian Poker Server Test</title>
+  <title>Indian Poker</title>
 </svelte:head>
 
 <main>
-  <h1>Indian Poker Server Test</h1>
+  <h1>Indian Poker</h1>
 
-  {#if client.state.error}
-    <p class="error" role="alert">{client.state.error}</p>
-  {/if}
-
-  <GameControls {client} />
-
-  {#if client.state.room}
-    <RoomView
-      room={client.state.room}
-      role={client.state.role}
-      seat={client.state.seat}
-      view={client.state.view}
-      onViewChange={(view) => (client.state.view = view)}
-    />
-  {/if}
+  <nav aria-label="Main navigation">
+    <a href="/create">Create New Game</a>
+    <a href="/rooms">View Room List</a>
+  </nav>
 </main>
 
 <style>
@@ -43,7 +22,16 @@
     font-family: sans-serif;
   }
 
-  .error {
-    color: #b42318;
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  a {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    color: inherit;
   }
 </style>

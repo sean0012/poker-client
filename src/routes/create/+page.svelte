@@ -1,0 +1,55 @@
+<script lang="ts">
+  import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
+  import GameControls from "$lib/game/GameControls.svelte";
+  import { createGameClient } from "$lib/game/game-client.svelte";
+
+  const client = createGameClient();
+
+  function openCreatedRoom() {
+    if (client.state.room) {
+      void goto(`/rooms/${encodeURIComponent(client.state.room.name)}`);
+    }
+  }
+
+  onMount(() => {
+    return () => client.leaveRoom();
+  });
+</script>
+
+<svelte:head>
+  <title>Create New Game | Indian Poker</title>
+</svelte:head>
+
+<main>
+  <nav><a href="/">Indian Poker</a><a href="/rooms">View Room List</a></nav>
+  <h1>Create New Game</h1>
+
+  {#if client.state.error}
+    <p class="error" role="alert">{client.state.error}</p>
+  {/if}
+
+  <GameControls {client} onCreated={openCreatedRoom} />
+</main>
+
+<style>
+  main {
+    max-width: 720px;
+    margin: 32px auto;
+    padding: 0 16px;
+    font-family: sans-serif;
+  }
+
+  nav {
+    display: flex;
+    gap: 12px;
+  }
+
+  nav a {
+    color: inherit;
+  }
+
+  .error {
+    color: #b42318;
+  }
+</style>

@@ -1,11 +1,15 @@
 <script lang="ts">
   import type { GameClient } from "./game-client.svelte";
 
-  let { client }: { client: GameClient } = $props();
+  let {
+    client,
+    onCreated,
+  }: { client: GameClient; onCreated?: () => void } = $props();
 
-  function submit(event: SubmitEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault();
-    void client.createGame();
+    await client.createGame();
+    if (client.state.room) onCreated?.();
   }
 </script>
 
@@ -67,56 +71,6 @@
     </fieldset>
   </form>
 
-  <div class="actions">
-    <button
-      onclick={client.getRoomInfo}
-      disabled={client.state.busy ||
-        client.state.status === "connecting" ||
-        !client.state.roomName.trim()}
-    >
-      {client.state.busy ? "Requesting…" : "Get Room Info / Refresh"}
-    </button>
-
-    <button
-      onclick={() => client.joinRoom("player")}
-      disabled={client.state.busy ||
-        client.state.status !== "disconnected" ||
-        !client.state.roomName.trim()}
-    >
-      Join as Player
-    </button>
-
-    <button
-      onclick={() => client.joinRoom("spectator")}
-      disabled={client.state.busy ||
-        client.state.status !== "disconnected" ||
-        !client.state.roomName.trim()}
-    >
-      Join as Spectator
-    </button>
-
-    <button
-      onclick={client.leaveRoom}
-      disabled={client.state.busy || client.state.status === "disconnected"}
-    >
-      {client.state.status === "connecting"
-        ? "Cancel Connection"
-        : "Leave Room"}
-    </button>
-  </div>
-
-  <p aria-live="polite">
-    {#if client.state.status === "connecting"}
-      Joining…
-    {:else if client.state.status === "connected"}
-      {client.state.role === "player"
-        ? `Player · Seat ${client.state.seat}`
-        : "Spectator"}
-      Connected
-    {:else}
-      Not in a room
-    {/if}
-  </p>
 </section>
 
 <style>
@@ -159,10 +113,4 @@
     cursor: default;
   }
 
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 16px;
-  }
 </style>
