@@ -9,6 +9,7 @@ import type {
 export function createGameClient() {
   const state = $state({
     roomName: 'game-1',
+    roomId: '',
     deckSize: 20 as number | undefined,
     firstChips: 20 as number | undefined,
     secondChips: 20 as number | undefined,
@@ -60,6 +61,7 @@ export function createGameClient() {
       );
 
       state.roomName = state.room.name;
+      state.roomId = state.room.id;
     } catch (cause) {
       showError(cause);
     } finally {
@@ -68,16 +70,16 @@ export function createGameClient() {
   }
 
   async function getRoomInfo() {
-    const name = state.roomName.trim();
+    const id = state.roomId.trim();
 
-    if (!name || state.busy || state.status === 'connecting') return;
+    if (!id || state.busy || state.status === 'connecting') return;
 
     state.busy = true;
     state.error = '';
 
     try {
       state.room = await readRoom(
-        await fetch(`/rooms/${encodeURIComponent(name)}`)
+        await fetch(`/rooms/${encodeURIComponent(id)}`)
       );
     } catch (cause) {
       // Do not keep showing the previous room when another lookup fails.
@@ -89,16 +91,16 @@ export function createGameClient() {
   }
 
   function joinRoom(nextRole: Role) {
-    const name = state.roomName.trim();
+    const id = state.roomId.trim();
 
-    if (!name || state.busy || state.status !== 'disconnected') return;
+    if (!id || state.busy || state.status !== 'disconnected') return;
 
     state.error = '';
     state.room = null;
     state.role = null;
     state.seat = null;
     state.view = 'opponent';
-    state.roomName = name;
+    state.roomId = id;
     state.status = 'connecting';
 
     try {
@@ -106,7 +108,7 @@ export function createGameClient() {
 
       const connection = new WebSocket(
         `${protocol}//${location.host}/rooms/` +
-          `${encodeURIComponent(name)}/${nextRole}`
+          `${encodeURIComponent(id)}/${nextRole}`
       );
 
       socket = connection;

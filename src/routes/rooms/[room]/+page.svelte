@@ -8,10 +8,10 @@
   const client = createGameClient();
 
   async function loadRoom() {
-    const roomName = page.params.room;
-    if (!roomName) return;
+    const roomId = page.params.room;
+    if (!roomId) return;
 
-    client.state.roomName = roomName;
+    client.state.roomId = roomId;
     await client.getRoomInfo();
 
     const requestedRole = page.url.searchParams.get("role");
@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
-  <title>{page.params.room} | Indian Poker</title>
+  <title>{client.state.room?.name ?? page.params.room} | Indian Poker</title>
 </svelte:head>
 
 <main>
@@ -38,7 +38,7 @@
     <a href="/">Indian Poker</a>
     <a href="/rooms">View Room List</a>
   </nav>
-  <h1>{page.params.room}</h1>
+  <h1>{client.state.room?.name ?? page.params.room}</h1>
 
   {#if client.state.error}
     <p class="error" role="alert">{client.state.error}</p>

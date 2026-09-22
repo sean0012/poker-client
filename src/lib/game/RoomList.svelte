@@ -45,15 +45,15 @@
     <p>No rooms available.</p>
   {:else}
     <ul>
-      {#each rooms as room (room.name)}
+      {#each rooms as room (room.id)}
         <li>
           <div>
             <strong>{room.name}</strong>
             <span>{room.players.filter((player) => player.connected).length}/2 players connected</span>
           </div>
           <div class="actions">
-            <a href={`/rooms/${encodeURIComponent(room.name)}?role=player`}>Join as Player</a>
-            <a href={`/rooms/${encodeURIComponent(room.name)}?role=spectator`}>Join as Spectator</a>
+            <a href={`/rooms/${encodeURIComponent(room.id)}?role=player`}>Join as Player</a>
+            <a href={`/rooms/${encodeURIComponent(room.id)}?role=spectator`}>Join as Spectator</a>
           </div>
         </li>
       {/each}

@@ -24,9 +24,8 @@
         Room name
         <input
           bind:value={client.state.roomName}
-          pattern={"[A-Za-z0-9_-]{1,40}"}
           maxlength="40"
-          title="Use 1 to 40 letters, numbers, hyphens, or underscores"
+          title="Use 1 to 40 characters"
           required
         />
       </label>

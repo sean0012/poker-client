@@ -11,6 +11,7 @@ export type Player = {
 };
 
 export type Room = {
+  id: string;
   name: string;
   deck_size: number;
   remaining_cards: number;

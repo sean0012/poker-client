@@ -8,7 +8,7 @@
 
   function openCreatedRoom() {
     if (client.state.room) {
-      void goto(`/rooms/${encodeURIComponent(client.state.room.name)}`);
+      void goto(`/rooms/${encodeURIComponent(client.state.room.id)}`);
     }
   }
 
