@@ -1,20 +1,21 @@
 import type {
   Gaze,
   Role,
-  Room,
+  Game,
   ServerEvent,
   Status,
 } from './types';
+import { getGuestId } from '$lib/session/guest-session';
 
 export function createGameClient() {
   const state = $state({
-    roomName: 'game-1',
-    roomId: '',
+    gameName: 'game-1',
+    gameId: '',
     deckSize: 20 as number | undefined,
     firstChips: 20 as number | undefined,
     secondChips: 20 as number | undefined,
 
-    room: null as Room | null,
+    game: null as Game | null,
     status: 'disconnected' as Status,
     role: null as Role | null,
     seat: null as number | null,
@@ -31,7 +32,7 @@ export function createGameClient() {
       cause instanceof Error ? cause.message : String(cause);
   }
 
-  async function readRoom(response: Response): Promise<Room> {
+  async function readGame(response: Response): Promise<Game> {
     if (!response.ok) {
       throw new Error(
         `${response.status}: ${await response.text()}`
@@ -48,20 +49,20 @@ export function createGameClient() {
     state.error = '';
 
     try {
-      state.room = await readRoom(
-        await fetch('/rooms', {
+      state.game = await readGame(
+        await fetch('/games', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: state.roomName.trim(),
+            name: state.gameName.trim(),
             deck_size: state.deckSize,
             initial_chips: [state.firstChips, state.secondChips],
           }),
         })
       );
 
-      state.roomName = state.room.name;
-      state.roomId = state.room.id;
+      state.gameName = state.game.name;
+      state.gameId = state.game.id;
     } catch (cause) {
       showError(cause);
     } finally {
@@ -69,8 +70,8 @@ export function createGameClient() {
     }
   }
 
-  async function getRoomInfo() {
-    const id = state.roomId.trim();
+  async function getGameInfo() {
+    const id = state.gameId.trim();
 
     if (!id || state.busy || state.status === 'connecting') return;
 
@@ -78,37 +79,38 @@ export function createGameClient() {
     state.error = '';
 
     try {
-      state.room = await readRoom(
-        await fetch(`/rooms/${encodeURIComponent(id)}`)
+      state.game = await readGame(
+        await fetch(`/games/${encodeURIComponent(id)}`)
       );
     } catch (cause) {
-      // Do not keep showing the previous room when another lookup fails.
-      if (state.status === 'disconnected') state.room = null;
+      // Do not keep showing the previous game when another lookup fails.
+      if (state.status === 'disconnected') state.game = null;
       showError(cause);
     } finally {
       state.busy = false;
     }
   }
 
-  function joinRoom(nextRole: Role) {
-    const id = state.roomId.trim();
+  function joinGame(nextRole: Role) {
+    const id = state.gameId.trim();
+    const guestId = getGuestId();
 
     if (!id || state.busy || state.status !== 'disconnected') return;
 
     state.error = '';
-    state.room = null;
+    state.game = null;
     state.role = null;
     state.seat = null;
     state.view = 'opponent';
-    state.roomId = id;
+    state.gameId = id;
     state.status = 'connecting';
 
     try {
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
 
       const connection = new WebSocket(
-        `${protocol}//${location.host}/rooms/` +
-          `${encodeURIComponent(id)}/${nextRole}`
+        `${protocol}//${location.host}/games/` +
+          `${encodeURIComponent(id)}/${nextRole}?guest_id=${encodeURIComponent(guestId)}`
       );
 
       socket = connection;
@@ -121,25 +123,25 @@ export function createGameClient() {
 
           if (message.type === 'error') {
             state.error = message.message;
-            leaveRoom();
+            leaveGame();
             return;
           }
 
           if (message.type === 'joined') {
             state.role = message.role;
             state.seat = message.seat;
-            state.room = message.room;
+            state.game = message.game;
             state.status = 'connected';
           }
         } catch {
           state.error = 'Unable to parse the server message.';
-          leaveRoom();
+          leaveGame();
         }
       };
 
       connection.onerror = () => {
         if (socket !== connection) return;
-        state.error = 'Connection failed. Check the server address and room name.';
+        state.error = 'Connection failed. Check the server address and game ID.';
       };
 
       connection.onclose = () => {
@@ -149,15 +151,15 @@ export function createGameClient() {
         state.status = 'disconnected';
         state.role = null;
         state.seat = null;
-        state.room = null;
+        state.game = null;
       };
     } catch (cause) {
-      leaveRoom();
+      leaveGame();
       showError(cause);
     }
   }
 
-  function leaveRoom() {
+  function leaveGame() {
     const previous = socket;
     socket = null;
     previous?.close();
@@ -165,15 +167,15 @@ export function createGameClient() {
     state.status = 'disconnected';
     state.role = null;
     state.seat = null;
-    state.room = null;
+    state.game = null;
   }
 
   return {
     state,
     createGame,
-    getRoomInfo,
-    joinRoom,
-    leaveRoom,
+    getGameInfo,
+    joinGame,
+    leaveGame,
   };
 }
 

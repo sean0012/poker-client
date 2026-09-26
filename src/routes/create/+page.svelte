@@ -6,14 +6,14 @@
 
   const client = createGameClient();
 
-  function openCreatedRoom() {
-    if (client.state.room) {
-      void goto(`/rooms/${encodeURIComponent(client.state.room.id)}`);
+  function openCreatedGame() {
+    if (client.state.game) {
+      void goto(`/games/${encodeURIComponent(client.state.game.id)}`);
     }
   }
 
   onMount(() => {
-    return () => client.leaveRoom();
+    return () => client.leaveGame();
   });
 </script>
 
@@ -22,14 +22,14 @@
 </svelte:head>
 
 <main>
-  <nav><a href="/">Indian Poker</a><a href="/rooms">View Room List</a></nav>
+  <nav><a href="/">Indian Poker</a><a href="/games">View Games</a></nav>
   <h1>Create New Game</h1>
 
   {#if client.state.error}
     <p class="error" role="alert">{client.state.error}</p>
   {/if}
 
-  <GameControls {client} onCreated={openCreatedRoom} />
+  <GameControls {client} onCreated={openCreatedGame} />
 </main>
 
 <style>

@@ -1,22 +1,22 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Room } from "./types";
+  import type { Game } from "./types";
 
-  let rooms = $state<Room[]>([]);
+  let games = $state<Game[]>([]);
   let busy = $state(false);
   let error = $state("");
 
-  async function loadRooms() {
+  async function loadGames() {
     busy = true;
     error = "";
 
     try {
-      const response = await fetch("/rooms");
+      const response = await fetch("/games");
       if (!response.ok) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
 
-      rooms = await response.json();
+      games = await response.json();
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
     } finally {
@@ -25,35 +25,42 @@
   }
 
   onMount(() => {
-    void loadRooms();
+    void loadGames();
   });
 </script>
 
 <section>
   <div class="heading">
-    <h2>Room List</h2>
-    <button type="button" onclick={loadRooms} disabled={busy}>
+    <h2>Games</h2>
+    <button type="button" onclick={loadGames} disabled={busy}>
       {busy ? "Refreshing..." : "Refresh"}
     </button>
   </div>
 
   {#if error}
     <p class="error" role="alert">{error}</p>
-  {:else if busy && rooms.length === 0}
-    <p>Loading rooms...</p>
-  {:else if rooms.length === 0}
-    <p>No rooms available.</p>
+  {:else if busy && games.length === 0}
+    <p>Loading games...</p>
+  {:else if games.length === 0}
+    <p>No games available.</p>
   {:else}
     <ul>
-      {#each rooms as room (room.id)}
+      {#each games as game (game.id)}
         <li>
           <div>
-            <strong>{room.name}</strong>
-            <span>{room.players.filter((player) => player.connected).length}/2 players connected</span>
+            <strong>{game.name}</strong>
+            <span
+              >{game.players.filter((player) => player.connected).length}/2
+              players connected</span
+            >
           </div>
           <div class="actions">
-            <a href={`/rooms/${encodeURIComponent(room.id)}?role=player`}>Join as Player</a>
-            <a href={`/rooms/${encodeURIComponent(room.id)}?role=spectator`}>Join as Spectator</a>
+            <a href={`/games/${encodeURIComponent(game.id)}?role=player`}
+              >Join as Player</a
+            >
+            <a href={`/games/${encodeURIComponent(game.id)}?role=spectator`}
+              >Join as Spectator</a
+            >
           </div>
         </li>
       {/each}

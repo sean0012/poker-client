@@ -1,29 +1,27 @@
 <script lang="ts">
   import type { GameClient } from "./game-client.svelte";
 
-  let {
-    client,
-    onCreated,
-  }: { client: GameClient; onCreated?: () => void } = $props();
+  let { client, onCreated }: { client: GameClient; onCreated?: () => void } =
+    $props();
 
   async function submit(event: SubmitEvent) {
     event.preventDefault();
     await client.createGame();
-    if (client.state.room) onCreated?.();
+    if (client.state.game) onCreated?.();
   }
 </script>
 
 <section>
-  <h2>Game Room</h2>
+  <h2>Game Setup</h2>
 
   <form onsubmit={submit}>
     <fieldset
       disabled={client.state.busy || client.state.status !== "disconnected"}
     >
       <label>
-        Room name
+        Game name
         <input
-          bind:value={client.state.roomName}
+          bind:value={client.state.gameName}
           maxlength="40"
           title="Use 1 to 40 characters"
           required
@@ -69,7 +67,6 @@
       <button type="submit">Create New Game</button>
     </fieldset>
   </form>
-
 </section>
 
 <style>
@@ -111,5 +108,4 @@
   button:disabled {
     cursor: default;
   }
-
 </style>

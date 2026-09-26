@@ -1,15 +1,15 @@
 <script lang="ts">
-  import RoomList from "$lib/game/RoomList.svelte";
+  import GameList from "$lib/game/GameList.svelte";
 </script>
 
 <svelte:head>
-  <title>Room List | Indian Poker</title>
+  <title>Games | Indian Poker</title>
 </svelte:head>
 
 <main>
   <nav><a href="/">Indian Poker</a><a href="/create">Create New Game</a></nav>
-  <h1>Room List</h1>
-  <RoomList />
+  <h1>Games</h1>
+  <GameList />
 </main>
 
 <style>

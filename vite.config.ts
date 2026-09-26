@@ -19,7 +19,7 @@ export default defineConfig({
 	],
 	server: {
 		proxy: {
-			'/rooms': {
+			'/games': {
 				target: 'http://127.0.0.1:3000',
 				ws: true,
 			},

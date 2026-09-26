@@ -1,44 +1,44 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { onMount } from "svelte";
-  import RoomView from "$lib/game/RoomView.svelte";
+  import GameView from "$lib/game/GameView.svelte";
   import { createGameClient } from "$lib/game/game-client.svelte";
   import type { Role } from "$lib/game/types";
 
   const client = createGameClient();
 
-  async function loadRoom() {
-    const roomId = page.params.room;
-    if (!roomId) return;
+  async function loadGame() {
+    const gameId = page.params.game;
+    if (!gameId) return;
 
-    client.state.roomId = roomId;
-    await client.getRoomInfo();
+    client.state.gameId = gameId;
+    await client.getGameInfo();
 
     const requestedRole = page.url.searchParams.get("role");
     if (
-      client.state.room &&
+      client.state.game &&
       (requestedRole === "player" || requestedRole === "spectator")
     ) {
-      client.joinRoom(requestedRole as Role);
+      client.joinGame(requestedRole as Role);
     }
   }
 
   onMount(() => {
-    void loadRoom();
-    return () => client.leaveRoom();
+    void loadGame();
+    return () => client.leaveGame();
   });
 </script>
 
 <svelte:head>
-  <title>{client.state.room?.name ?? page.params.room} | Indian Poker</title>
+  <title>{client.state.game?.name ?? page.params.game} | Indian Poker</title>
 </svelte:head>
 
 <main>
   <nav>
     <a href="/">Indian Poker</a>
-    <a href="/rooms">View Room List</a>
+    <a href="/games">View Games</a>
   </nav>
-  <h1>{client.state.room?.name ?? page.params.room}</h1>
+  <h1>{client.state.game?.name ?? page.params.game}</h1>
 
   {#if client.state.error}
     <p class="error" role="alert">{client.state.error}</p>
@@ -47,17 +47,19 @@
   <div class="actions">
     <button
       type="button"
-      onclick={client.getRoomInfo}
+      onclick={client.getGameInfo}
       disabled={client.state.busy || client.state.status === "connecting"}
     >
-      {client.state.busy ? "Requesting..." : "Get Room Info"}
+      {client.state.busy ? "Requesting..." : "Get Game Info"}
     </button>
     <button
       type="button"
-      onclick={client.leaveRoom}
+      onclick={client.leaveGame}
       disabled={client.state.status === "disconnected"}
     >
-      {client.state.status === "connecting" ? "Cancel Connection" : "Leave Room"}
+      {client.state.status === "connecting"
+        ? "Cancel Connection"
+        : "Leave Game"}
     </button>
   </div>
 
@@ -72,9 +74,9 @@
     </p>
   {/if}
 
-  {#if client.state.room}
-    <RoomView
-      room={client.state.room}
+  {#if client.state.game}
+    <GameView
+      game={client.state.game}
       role={client.state.role}
       seat={client.state.seat}
       view={client.state.view}

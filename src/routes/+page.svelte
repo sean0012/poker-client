@@ -10,7 +10,7 @@
 
   <nav aria-label="Main navigation">
     <a href="/create">Create New Game</a>
-    <a href="/rooms">View Room List</a>
+    <a href="/games">View Games</a>
   </nav>
 </main>
 

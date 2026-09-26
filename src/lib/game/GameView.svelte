@@ -1,34 +1,34 @@
 <script lang="ts">
   import HoverCount from "./HoverCount.svelte";
-  import type { Gaze, Role, Room } from "./types";
+  import type { Game, Gaze, Role } from "./types";
 
   type Props = {
-    room: Room;
+    game: Game;
     role: Role | null;
     seat: number | null;
     view: Gaze;
     onViewChange: (view: Gaze) => void;
   };
 
-  let { room, role, seat, view, onViewChange }: Props = $props();
+  let { game, role, seat, view, onViewChange }: Props = $props();
 
-  const me = $derived(room.players.find((player) => player.seat === seat));
+  const me = $derived(game.players.find((player) => player.seat === seat));
 
   const opponent = $derived(
     seat === null
       ? undefined
-      : room.players.find((player) => player.seat !== seat),
+      : game.players.find((player) => player.seat !== seat),
   );
 </script>
 
 <section>
-  <h2>{room.name}</h2>
+  <h2>{game.name}</h2>
 
-  <p>Spectators: {room.spectators}</p>
-  <HoverCount label="Total deck size" value={room.deck_size} />
+  <p>Spectators: {game.spectators}</p>
+  <HoverCount label="Total deck size" value={game.deck_size} />
 
   <ul>
-    {#each room.players as player (player.seat)}
+    {#each game.players as player (player.seat)}
       <li>
         <strong>Player {player.seat}</strong>
         · {player.connected ? "Connected" : "Empty seat"}
@@ -40,7 +40,7 @@
   </ul>
 
   <p class="hint">
-    Hover over a number or focus it with the keyboard to reveal its value. Room
+    Hover over a number or focus it with the keyboard to reveal its value. Game
     information reflects the state at the time it was fetched.
   </p>
 </section>
@@ -77,12 +77,12 @@
           label="Opponent chip stack"
           value={opponent.current_chips}
         />
-        <HoverCount label="Cards remaining" value={room.remaining_cards} />
+        <HoverCount label="Cards remaining" value={game.remaining_cards} />
       {:else}
         <h3>My Chips and Table</h3>
 
         <HoverCount label="My chip stack" value={me.current_chips} />
-        <HoverCount label="Pot" value={room.pot} />
+        <HoverCount label="Pot" value={game.pot} />
       {/if}
     </div>
 
@@ -92,9 +92,9 @@
   </section>
 {:else}
   <section>
-    <h2>{role === "spectator" ? "Spectator View" : "Room Status Preview"}</h2>
+    <h2>{role === "spectator" ? "Spectator View" : "Game Status Preview"}</h2>
 
-    {#each room.players as player (player.seat)}
+    {#each game.players as player (player.seat)}
       <p>
         <HoverCount
           label={`Player ${player.seat} current chips`}
@@ -103,8 +103,8 @@
       </p>
     {/each}
 
-    <HoverCount label="Cards remaining" value={room.remaining_cards} />
-    <HoverCount label="Pot" value={room.pot} />
+    <HoverCount label="Cards remaining" value={game.remaining_cards} />
+    <HoverCount label="Pot" value={game.pot} />
   </section>
 {/if}
 
@@ -112,12 +112,12 @@
   <h2>Game History</h2>
 
   <ol>
-    {#each room.history as entry}
+    {#each game.history as entry}
       <li>{entry}</li>
     {/each}
   </ol>
 
-  {#if room.history.length === 0}
+  {#if game.history.length === 0}
     <p>No game history yet.</p>
   {/if}
 </section>

@@ -10,7 +10,7 @@ export type Player = {
   gaze: Gaze;
 };
 
-export type Room = {
+export type Game = {
   id: string;
   name: string;
   deck_size: number;
@@ -26,7 +26,7 @@ export type ServerEvent =
       type: 'joined';
       role: Role;
       seat: number | null;
-      room: Room;
+      game: Game;
     }
   | {
       type: 'error';
