@@ -1,5 +1,6 @@
 export type GuestSession = {
   user_id: string;
+  display_name: string;
   avatar: string;
 };
 

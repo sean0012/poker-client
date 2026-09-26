@@ -44,14 +44,16 @@
 {/if}
 
 {#if guestSession}
-  <p class="session-status">Guest · {guestSession.user_id}</p>
+  <p class="session-status" aria-label="Your display name">
+    {guestSession.display_name}
+  </p>
 {/if}
 
 <style>
   .session-status {
     position: fixed;
     right: 16px;
-    bottom: 16px;
+    top: 16px;
     margin: 0;
     padding: 8px 12px;
     border: 1px solid #ccc;

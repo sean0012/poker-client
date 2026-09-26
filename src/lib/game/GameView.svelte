@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ChipBetting from "./ChipBetting.svelte";
   import HoverCount from "./HoverCount.svelte";
   import PlayerAvatar from "./PlayerAvatar.svelte";
   import type { Game, Gaze, Role } from "./types";
@@ -89,9 +90,9 @@
       {/if}
     </div>
 
-    <p class="hint">
-      View changes apply only to this screen and are not sent to the server.
-    </p>
+    {#key `${game.id}:${seat}:${me.current_chips}`}
+      <ChipBetting chips={me.current_chips} />
+    {/key}
   </section>
 {:else}
   <section>
