@@ -8,7 +8,7 @@
 
   function openCreatedGame() {
     if (client.state.game) {
-      void goto(`/games/${encodeURIComponent(client.state.game.id)}`);
+      void goto(`/games/${encodeURIComponent(client.state.game.id)}?role=player`);
     }
   }
 
