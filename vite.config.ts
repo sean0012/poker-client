@@ -19,6 +19,9 @@ export default defineConfig({
 	],
 	server: {
 		proxy: {
+			'/session': {
+				target: 'http://127.0.0.1:3000',
+			},
 			'/games': {
 				target: 'http://127.0.0.1:3000',
 				ws: true,

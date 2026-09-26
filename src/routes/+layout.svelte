@@ -1,13 +1,30 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import favicon from "$lib/assets/favicon.svg";
-  import { getGuestId } from "$lib/session/guest-session";
+  import {
+    initializeGuestSession,
+    type GuestSession,
+  } from "$lib/session/guest-session";
 
   let { children } = $props();
-  let guestId = $state("");
+  let guestSession = $state<GuestSession | null>(null);
+  let sessionError = $state("");
+  let sessionLoading = $state(true);
+
+  async function initializeSession() {
+    sessionLoading = true;
+    sessionError = "";
+    try {
+      guestSession = await initializeGuestSession();
+    } catch (cause) {
+      sessionError = cause instanceof Error ? cause.message : String(cause);
+    } finally {
+      sessionLoading = false;
+    }
+  }
 
   onMount(() => {
-    guestId = getGuestId();
+    void initializeSession();
   });
 </script>
 
@@ -15,10 +32,19 @@
   <link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+{#if sessionLoading}
+  <p class="session-status" aria-live="polite">Starting guest profile...</p>
+{:else if sessionError}
+  <div class="session-error" role="alert">
+    <p>Unable to start a guest profile: {sessionError}</p>
+    <button type="button" onclick={initializeSession}>Retry</button>
+  </div>
+{:else}
+  {@render children()}
+{/if}
 
-{#if guestId}
-  <p class="session-status">Signed in as {guestId}</p>
+{#if guestSession}
+  <p class="session-status">Guest · {guestSession.user_id}</p>
 {/if}
 
 <style>
@@ -31,5 +57,17 @@
     border: 1px solid #ccc;
     background: white;
     font-size: 14px;
+  }
+
+  .session-error {
+    max-width: 720px;
+    margin: 32px auto;
+    padding: 16px;
+    color: #b42318;
+  }
+
+  button {
+    padding: 8px 12px;
+    font: inherit;
   }
 </style>

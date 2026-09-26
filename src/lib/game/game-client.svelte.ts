@@ -5,7 +5,6 @@ import type {
   ServerEvent,
   Status,
 } from './types';
-import { getGuestId } from '$lib/session/guest-session';
 
 export function createGameClient() {
   const state = $state({
@@ -93,7 +92,6 @@ export function createGameClient() {
 
   function joinGame(nextRole: Role) {
     const id = state.gameId.trim();
-    const guestId = getGuestId();
 
     if (!id || state.busy || state.status !== 'disconnected') return;
 
@@ -110,7 +108,7 @@ export function createGameClient() {
 
       const connection = new WebSocket(
         `${protocol}//${location.host}/games/` +
-          `${encodeURIComponent(id)}/${nextRole}?guest_id=${encodeURIComponent(guestId)}`
+          `${encodeURIComponent(id)}/${nextRole}`
       );
 
       socket = connection;

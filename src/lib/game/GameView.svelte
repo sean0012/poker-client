@@ -1,5 +1,6 @@
 <script lang="ts">
   import HoverCount from "./HoverCount.svelte";
+  import PlayerAvatar from "./PlayerAvatar.svelte";
   import type { Game, Gaze, Role } from "./types";
 
   type Props = {
@@ -70,7 +71,7 @@
         <h3>Opponent · Player {opponent.seat}</h3>
         <p>{opponent.connected ? "Connected" : "Waiting for opponent"}</p>
 
-        <div class="placeholder">Opponent face area</div>
+        <PlayerAvatar seat={opponent.seat} avatar={opponent.avatar} />
         <div class="placeholder">Opponent card · Not dealt yet</div>
 
         <HoverCount
@@ -94,14 +95,30 @@
   <section>
     <h2>{role === "spectator" ? "Spectator View" : "Game Status Preview"}</h2>
 
-    {#each game.players as player (player.seat)}
-      <p>
-        <HoverCount
-          label={`Player ${player.seat} current chips`}
-          value={player.current_chips}
-        />
-      </p>
-    {/each}
+    {#if role === "spectator"}
+      <div class="spectator-players">
+        {#each game.players as player (player.seat)}
+          <div class="spectator-player">
+            <PlayerAvatar seat={player.seat} avatar={player.avatar} size="small" />
+            <h3>Player {player.seat}</h3>
+            <p>{player.connected ? "Connected" : "Waiting"}</p>
+            <HoverCount
+              label={`Player ${player.seat} current chips`}
+              value={player.current_chips}
+            />
+          </div>
+        {/each}
+      </div>
+    {:else}
+      {#each game.players as player (player.seat)}
+        <p>
+          <HoverCount
+            label={`Player ${player.seat} current chips`}
+            value={player.current_chips}
+          />
+        </p>
+      {/each}
+    {/if}
 
     <HoverCount label="Cards remaining" value={game.remaining_cards} />
     <HoverCount label="Pot" value={game.pot} />
@@ -161,6 +178,27 @@
     margin-top: 16px;
     padding: 16px;
     border: 1px dashed #aaa;
+  }
+
+  .spectator-players {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .spectator-player {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
+  .spectator-player h3 {
+    margin: 8px 0 4px;
+  }
+
+  .spectator-player p {
+    margin: 4px 0 12px;
   }
 
   .placeholder {
