@@ -29,6 +29,10 @@ export type ServerEvent =
       game: Game;
     }
   | {
+      type: 'game_updated';
+      game: Game;
+    }
+  | {
       type: 'error';
       message: string;
     };

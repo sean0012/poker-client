@@ -132,6 +132,8 @@ export function createGameClient() {
             state.seat = message.seat;
             state.game = message.game;
             state.status = 'connected';
+          } else if (message.type === 'game_updated') {
+            state.game = message.game;
           }
         } catch {
           state.error = 'Unable to parse the server message.';
