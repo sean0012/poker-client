@@ -71,7 +71,9 @@
         <h3>Opponent · Player {opponent.seat}</h3>
         <p>{opponent.connected ? "Connected" : "Waiting for opponent"}</p>
 
-        <PlayerAvatar seat={opponent.seat} avatar={opponent.avatar} />
+        {#if opponent.connected}
+          <PlayerAvatar seat={opponent.seat} avatar={opponent.avatar} />
+        {/if}
         <div class="placeholder">Opponent card · Not dealt yet</div>
 
         <HoverCount
@@ -99,7 +101,13 @@
       <div class="spectator-players">
         {#each game.players as player (player.seat)}
           <div class="spectator-player">
-            <PlayerAvatar seat={player.seat} avatar={player.avatar} size="small" />
+            {#if player.connected}
+              <PlayerAvatar
+                seat={player.seat}
+                avatar={player.avatar}
+                size="small"
+              />
+            {/if}
             <h3>Player {player.seat}</h3>
             <p>{player.connected ? "Connected" : "Waiting"}</p>
             <HoverCount
