@@ -69,7 +69,9 @@
 
     <div class="view">
       {#if view === "opponent"}
-        <h3>Opponent · Player {opponent.seat}</h3>
+        <h3>
+          Opponent · {opponent.display_name ?? `Player ${opponent.seat}`}
+        </h3>
         <p>{opponent.connected ? "Connected" : "Waiting for opponent"}</p>
 
         {#if opponent.connected}

@@ -4,6 +4,7 @@ export type Gaze = 'opponent' | 'table';
 
 export type Player = {
   seat: number;
+  display_name: string | null;
   avatar: string;
   connected: boolean;
   initial_chips: number;
